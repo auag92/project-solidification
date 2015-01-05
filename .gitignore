@@ -41,7 +41,10 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+<<<<<<< HEAD
 
 *.png
 *.dat
 *.exe
+=======
+>>>>>>> parent of fec2b6c... added code files

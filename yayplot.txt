@@ -1,0 +1,37 @@
+
+
+set terminal png size 400,300
+set output "phi_plot.png"
+#set terminal postscript portrait
+#set output  "phi_plot.ps"
+set size 0.4,0.4
+set title "Phasefield"
+set xlabel "phi"
+set ylabel "meshx"
+plot "phi_10000.dat" using 1:2 with lines
+pause -1 "Hit any key to continue"
+
+# call is good. I can call a file and where i put in all the calculations, iterations and conditionals and then use it to call another file
+# which has the actual print commands and pass arguments to this file.
+# Do is a pretty useful statement
+
+# hey, write a full automated code in gnuplot to go through all the files and plot temp
+#
+
+flist = dir('phi_*.dat');
+
+N = size(flist,1);
+
+for k = 1:N
+
+   A= load(flist(k).name);
+   h=plot(A(:,1),A(:,2));
+   xlabel('meshx');
+   ylabel('phi');
+   legend(flist(k).name);
+   drawnow
+   fname =  sprintf('phi_%d',k);
+   if mod(k,10) == 0
+	saveas(h,fname,'png');
+   end
+end

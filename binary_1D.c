@@ -16,7 +16,7 @@
 #define sigma (1.0)  /*Surface energy*/
 #define W (10.0)     /*Interface-width*/
 #define H (3.0*sigma*4.4/W)  /*Height of potential*/
-#define kappa (3.0*sigma*W/4.4) 
+#define kappa (3.0*sigma*W/4.4)
 
 
 #define ntimesteps (5000000)
@@ -55,24 +55,24 @@ double compute_surface_energy(double *c);
 
 void main() {
   long i, t;
-  
+
   initialize(c_old);
   boundary(c_old);
   boundary(T_old);
-  
+
   for (t=0; t < ntimesteps; t++) {
-    
-#ifdef SOLIDIFICATION
+
+
    laplacian(c_old,     lap_c);
    laplacian(T_old,     lap_T);
    compute_chemical_potential(c_old, mu); //Computes (df_o/deta)
-   
+
    for (i=0; i < (MESHX); i++) {
       c_new[i] = c_old[i] + (deltat)*M*(-H*mu[i] + 2.0*kappa*lap_c[i] -6.0*L*(T_old[i] - Tm)*c_old[i]*(1.0-c_old[i])/Tm);
-      
-      T_new[i] = T_old[i] + (deltat/Cv)*(K*lap_T[i])  
-               + (L/Cv)*6.0*c_old[i]*(1.0-c_old[i])*(c_new[i]-c_old[i]); 
-      
+
+      T_new[i] = T_old[i] + (deltat/Cv)*(K*lap_T[i])
+               + (L/Cv)*6.0*c_old[i]*(1.0-c_old[i])*(c_new[i]-c_old[i]);
+
     }
 #endif
     boundary(c_new);
@@ -96,7 +96,7 @@ void update() {
   }
 }
 void compute_chemical_potential(double *c, double *mu) {
-  long i; 
+  long i;
   for (i=0; i < MESHX; i++) {
     mu[i] = 2.0*c[i]*(1.0 -3.0*c[i] + 2.0*c[i]*c[i]);
   }
@@ -104,7 +104,7 @@ void compute_chemical_potential(double *c, double *mu) {
 void free_energy(double *c, double *g) {
   long i;
 
-#ifdef SOLIDIFICATION 
+#ifdef SOLIDIFICATION
   for (i=0; i < MESHX; i++) {
     g[i] = H*c[i]*c[i]*(1.0-c[i])*(1.0-c[i]);
   }
@@ -129,7 +129,7 @@ void initialize(double *c) {
     c[i] = 0.0;
   }
 #endif
-    
+
 #ifdef SINE_PROFILE
 
 #ifdef SOLIDIFICATION
@@ -146,32 +146,32 @@ void initialize(double *c) {
 #endif
 }
 void boundary(double *c) {
-  
+
 #ifdef SOLIDIFICATION
   #ifdef DIRICHLET
   c[0]        = CONSTANT_X_0;
   c[MESHX-1]  = CONSTANT_X_1;
-  
+
   lap_c[0]        = 0.0;
   lap_c[MESHX-1]  = 0.0;
   #endif
-  
+
   #ifdef NEUMANN
   c[0]        = c[1];
   c[MESHX-1]  = c[MESHX-2];
-  
+
   lap_c[0]        = 0.0;
   lap_c[MESHX-1]  = 0.0;
   #endif
-  
+
   #ifdef PERIODIC
   c[0]            = c[MESHX-2];
   c[MESHX-1]      = c[1];
-  
+
   lap_c[0]        = lap_c[MESHX-2];
   lap_c[MESHX-1]  = lap_c[1];
   #endif
-#endif 
+#endif
 }
 
 void write2file (double *c, long t) {

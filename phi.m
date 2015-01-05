@@ -1,18 +1,14 @@
 flist = dir('phi_*.dat');
-
 N = size(flist,1);
 
-for k = 1:N
+for k = 1 : N-1
 
-   A= load(flist(k).name);
+   fname =  sprintf('phi_%d0000.dat',k);
+   A= load(fname);
    h=plot(A(:,1),A(:,2));
    xlabel('meshx');
    ylabel('phi');
-   legend(flist(k).name);
+   legend(fname);
    drawnow
-   fname =  sprintf('phi_%d',k);
-   if mod(k,10) == 0
-	saveas(h,fname,'png');
-   end
-end
 
+end
