@@ -3,22 +3,22 @@
 #include <sys/stat.h>
 
 #define MESHX 500
-#define deltat (0.03)
+#define deltat (0.01)
 #define deltax (1.0)
 #define deltax2 (deltax*deltax)
 
 
-#define K (1.0)             /*Partition Coefficient*/
+#define K (0.5)             /*Partition Coefficient*/
 #define G (1.0)             /*Surface Energy*/
 #define M (1.0)             /*Mobility*/
-#define E (10.0)            /*epsilon - dimensions of length [m]*/
+#define E (1.0)            /*epsilon - dimensions of length [m]*/
 #define tau (1.0)
 
-#define ntimesteps (5000000)
-#define saveT (10000)
+#define ntimesteps (5000)
+#define saveT (10)
 
 #define deltaMu (0.1)
-#define Mu (0.0)
+#define Mu (1.0)
 
 // #define DIRICHLET
 #define CONSTANT_X_0 (0.1)
