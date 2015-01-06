@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 
 #define MESHX 500
-#define deltat (0.01)
+#define deltat (0.03)
 #define deltax (1.0)
 #define deltax2 (deltax*deltax)
 
@@ -39,6 +39,7 @@
 double phi_new[MESHX], phi_old[MESHX];
 double mu_new[MESHX], mu_old[MESHX];
 double lap_phi[MESHX], lap_mu[MESHX];
+double conc[MESHX];
 
 double inv_deltax2 = (1.0/deltax2);
 
@@ -53,10 +54,11 @@ double DW(double phi);
 double Cs(double mu);
 double Cl(double mu);
 double khai(double phi);
+void concentration();
 
 void main() {
   long i, t;
-  double p,dp;
+  double p,dp,du;
 
   initialize(phi_old);
   boundary(phi_old);
@@ -70,15 +72,16 @@ void main() {
     for (i=0; i < (MESHX); i++) {
 
       p = phi_old[i];
-      dp = G*E*lap_phi[i] - G/E*9*p*p*(1-p)*(1-p) - (mu_old[i] - Mu)*(K-1)*(mu_old[i])*6*p*(1-p);
+      dp = G*E*lap_phi[i] - G/E*9*p*p*(1-p)*(1-p) + (mu_old[i] - Mu)*(K-1)*(mu_old[i])*6*p*(1-p);
       phi_new[i] = phi_old[i] + (deltat)*dp/tau/E;
-
-      mu_new[i] = mu_old[i] + deltat*( M*lap_mu[i] - (K-1)*mu_old[i]*6*p*(1-p)*dp);
+      du = M*lap_mu[i] - (K-1)*mu_old[i]*6*p*(1-p)*dp;
+      mu_new[i] = mu_old[i] + deltat*du/(K + (1-K)*p*p*(3-2*p));
 
     }
 
     boundary(phi_new);
     boundary(mu_new);
+    concentration();
     update();
     if((t%saveT) ==0) {
       write2file(t);
@@ -97,12 +100,25 @@ void update() {
   }
 }
 
-
 void laplacian(double *f, double *lap) {
   long i;
   for (i=1; i < (MESHX-1); i++) {
     lap[i] = (f[i-1] + f[i+1] -2.0*f[i])*inv_deltax2;
   }
+}
+
+void concentration(){
+
+  double p,u,h;
+  int i;
+  for ( i = 0; i < MESHX; i++)
+  {
+    p = phi_new[i];
+    u = mu_new[i];
+    h = p*p*(3-2*p);
+    conc[i] = u*h + (1-h)*K*u;
+  }
+
 }
 
 void initialize(double *c) {
@@ -150,6 +166,7 @@ void boundary(double *c) {
   #endif
 }
 
+
 void write2file ( long t) {
   long i;
   FILE *fp;
@@ -165,6 +182,13 @@ void write2file ( long t) {
   fp = fopen(filename,"w");
   for (i=0; i < (MESHX); i++) {
     fprintf(fp,"%le %le\n", i*deltax, mu_new[i]);
+  }
+  fclose(fp);
+
+  sprintf(filename,"Concentration_%ld.dat",t);
+  fp = fopen(filename,"w");
+  for (i=0; i < (MESHX); i++) {
+    fprintf(fp,"%le %le\n", i*deltax, conc[i]);
   }
   fclose(fp);
 
